@@ -1,7 +1,5 @@
 <?php
 
-namespace ruvents\yii\behaviors;
-
 class DeletableBehavior extends \CActiveRecordBehavior
 {
     protected function beforeDelete($event)

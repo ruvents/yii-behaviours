@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "b6738dd5e3ace4cb69b64a3b41a7bf5d",
+    "content-hash": "86516b9ee4046f3a6e44e2237330985b",
     "packages": [
         {
             "name": "yiisoft/yii",

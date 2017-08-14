@@ -27,7 +27,7 @@ $tableSchema = [
 ];
 
 $tableSchema = array_merge($tableSchema, DeletableBehavior::getMigrationFields());
-$tableSchema = array_merge($tableSchema, TimestampableBehavior::getMigrationFields());
+$tableSchema = array_merge($tableSchema, UpdatableBehavior::getMigrationFields());
 
 $this->createTable('BlogPost', $tableSchema);
 ```
@@ -46,8 +46,8 @@ foreach (DeletableBehavior::getMigrationFields() as $column => $type) {
 public function behaviors()
 {
 	return [
-		['class' => '\ruvents\yii\behaviors\TimestampableBehavior'],
-		['class' => '\ruvents\yii\behaviors\DeletableBehavior']
+		['class' => 'UpdatableBehavior'],
+		['class' => 'DeletableBehavior']
 	];
 }
 ```

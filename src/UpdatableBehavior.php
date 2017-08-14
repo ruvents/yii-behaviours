@@ -1,8 +1,6 @@
 <?php
 
-namespace ruvents\yii\behaviors;
-
-class TimestampableBehavior extends \CActiveRecordBehavior
+class UpdatableBehavior extends \CActiveRecordBehavior
 {
     protected function beforeSave($event)
     {
