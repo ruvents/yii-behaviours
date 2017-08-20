@@ -10,7 +10,7 @@ yii-behaviors
 Добавить в `composer.json` зависимость:
 
 ```json
-"vizh/yii-behaviors": "0.0.2"
+"vizh/yii-behaviors": "0.0.4"
 ```
 
 ## Миграции
@@ -47,7 +47,10 @@ public function behaviors()
 {
 	return [
 		['class' => 'UpdatableBehavior'],
-		['class' => 'DeletableBehavior']
+		['class' => 'DeletableBehavior'],
+		['class' => 'AttributableBehavior', 'attribute' => 'Attributes']
 	];
 }
 ```
+
+Для корректной работы AttributableBehavior необходимо завести в модели ActiveRecord публичное свойство, названное аналогично значению параметра 'attribute' настроек поведения.
