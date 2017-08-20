@@ -2,6 +2,13 @@
 
 class UpdatableBehavior extends \CActiveRecordBehavior
 {
+    public function events()
+    {
+        return [
+            'onBeforeSave' => 'beforeSave',
+        ];
+    }
+
     protected function beforeSave($event)
     {
         if ($this->owner->isNewRecord === false) {

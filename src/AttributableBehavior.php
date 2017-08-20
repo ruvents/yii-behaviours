@@ -5,6 +5,14 @@ class AttributableBehavior extends \CActiveRecordBehavior
     /** @var string */
     public $attribute = 'Attributes';
 
+    public function events()
+    {
+        return [
+            'onBeforeSave'=>'beforeSave',
+            'onAfterFind'=>'afterFind',
+        ];
+    }
+
     public function byAttribute($attribute, $value)
     {
         $model = $this->owner;

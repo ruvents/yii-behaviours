@@ -2,6 +2,14 @@
 
 class DeletableBehavior extends \CActiveRecordBehavior
 {
+    public function events()
+    {
+        return [
+            'onBeforeDelete' => 'beforeDelete',
+            'onBeforeFind' => 'beforeFind',
+        ];
+    }
+
     protected function beforeDelete($event)
     {
         $model = $this->owner;
