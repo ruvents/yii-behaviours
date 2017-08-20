@@ -53,4 +53,13 @@ public function behaviors()
 }
 ```
 
-Для корректной работы AttributableBehavior необходимо завести в модели ActiveRecord публичное свойство, названное аналогично значению параметра 'attribute' настроек поведения.
+Для корректной работы AttributableBehavior необходимо завести в модели ActiveRecord публичное свойство, названное аналогично значению параметра 'attribute' настроек поведения. Удобства ради, можно "пробросить" следующие методы в модель:
+
+```php
+/*
+ * Методы AttributableBehavior
+ * @method Role byAttribute($attribute, $value)
+ * @method Role byAttributeExists($attribute)
+ * @method Role byAttributeSearch($attribute, $value)
+ */
+```
