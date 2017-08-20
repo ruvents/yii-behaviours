@@ -10,7 +10,7 @@ yii-behaviors
 Добавить в `composer.json` зависимость:
 
 ```json
-"vizh/yii-behaviors": "0.0.5"
+"vizh/yii-behaviors": "0.0.6"
 ```
 
 ## Миграции

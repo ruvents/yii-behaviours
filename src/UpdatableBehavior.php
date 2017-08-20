@@ -9,7 +9,7 @@ class UpdatableBehavior extends \CActiveRecordBehavior
         ];
     }
 
-    protected function beforeSave($event)
+    public function beforeSave($event)
     {
         if ($this->owner->isNewRecord === false) {
             $this->owner->setAttribute('UpdateTime', 'NOW()');

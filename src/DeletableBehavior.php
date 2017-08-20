@@ -10,7 +10,7 @@ class DeletableBehavior extends \CActiveRecordBehavior
         ];
     }
 
-    protected function beforeDelete($event)
+    public function beforeDelete($event)
     {
         $model = $this->owner;
 
@@ -21,7 +21,7 @@ class DeletableBehavior extends \CActiveRecordBehavior
         return false;
     }
 
-    protected function beforeFind($event)
+    public function beforeFind($event)
     {
         $this->owner->getDbCriteria()->addCondition('not "Deleted"');
     }
