@@ -2,25 +2,12 @@
 
 class AttributableBehavior extends \CActiveRecordBehavior
 {
-    /** @var string */
-    public $attribute = 'Attributes';
-
     public function events()
     {
         return [
-            'onBeforeSave'=>'beforeSave',
-            'onAfterFind'=>'afterFind',
+            'onBeforeSave' => 'beforeSave',
+            'onAfterFind' => 'afterFind',
         ];
-    }
-
-    public function byAttribute($attribute, $value)
-    {
-        $model = $this->owner;
-
-        $criteria = $model->getDbCriteria();
-        $criteria->addColumnCondition(["{$model->getTableAlias(true)}.\"{$this->attribute}\"->>'{$attribute}'" => "$value"]);
-
-        return $model;
     }
 
     public function byAttributeExists($attribute)
@@ -28,7 +15,7 @@ class AttributableBehavior extends \CActiveRecordBehavior
         $model = $this->owner;
 
         $criteria = $model->getDbCriteria();
-        $criteria->addCondition("jsonb_exists({$model->getTableAlias(true)}.\"{$this->attribute}\", '{$attribute}')");
+        $criteria->addCondition("jsonb_exists({$model->getTableAlias(true)}.\"Attributes\", '{$attribute}')");
 
         return $model;
     }
@@ -38,7 +25,7 @@ class AttributableBehavior extends \CActiveRecordBehavior
         $model = $this->owner;
 
         $criteria = $model->getDbCriteria();
-        $criteria->addSearchCondition("{$model->getTableAlias(true)}.\"{$this->attribute}\"->>'{$attribute}'", "$value");
+        $criteria->addSearchCondition("{$model->getTableAlias(true)}.\"Attributes\"->>'{$attribute}'", "$value");
 
         return $model;
     }
@@ -46,12 +33,10 @@ class AttributableBehavior extends \CActiveRecordBehavior
     public function afterFind($event)
     {
         $model = $this->owner;
-        $attrs = $model->getAttribute($this->attribute);
+        $attrs = $model->getAttribute('Attributes');
 
-        $model->setAttribute($this->attribute, '{}' !== $attrs
-            ? json_decode($attrs, true)
-            : []
-        );
+        /** @var \AttributableTrait $model */
+        $model->initCustomAttributes($attrs);
 
         parent::afterFind($event);
     }
@@ -59,12 +44,10 @@ class AttributableBehavior extends \CActiveRecordBehavior
     public function beforeSave($event)
     {
         $model = $this->owner;
-        $attrs = $model->getAttribute($this->attribute);
-
-        $model->setAttribute($this->attribute, false === empty($attrs)
-            ? json_encode($attrs, JSON_UNESCAPED_UNICODE)
-            : '{}'
-        );
+        /** @var \AttributableTrait $model */
+        $json = $model->dumpCustomAttributes();
+        /** @var \application\components\ActiveRecord $model */
+        $model->setAttribute('Attributes', $json);
 
         parent::beforeSave($event);
     }
