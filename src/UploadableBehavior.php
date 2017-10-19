@@ -15,6 +15,14 @@ class UploadableBehavior extends CActiveRecordBehavior
      */
     public $fileFields = [];
 
+    public function events()
+    {
+        return [
+            'onBeforeSave' => 'beforeSave',
+            'onAfterDelete' => 'afterDelete',
+        ];
+    }
+
     public function beforeSave($event)
     {
         /** @var \application\components\ActiveRecord $model */
@@ -32,7 +40,7 @@ class UploadableBehavior extends CActiveRecordBehavior
             $value = $model->getAttribute($attribute);
             if ($value instanceof CUploadedFile) {
                 $publicPath = Yii::getPathOfAlias('webroot');
-                $fileDir = $config['fileDir'] ?? '/files/';
+                $fileDir = $config['fileDir'] ?? '/files';
                 $fileName = uniqid('', true).'.'.strtolower($value->getExtensionName());
                 if (false === $value->saveAs("{$publicPath}/{$fileDir}/{$fileName}")) {
                     $errmsg = 'Неизвестная ошибка загрузки файла. Обратитесь к разработчику.';
@@ -56,5 +64,19 @@ class UploadableBehavior extends CActiveRecordBehavior
         }
 
         parent::beforeSave($event);
+    }
+
+    public function afterDelete($event)
+    {
+        parent::afterDelete($event);
+
+        /** @var \application\components\ActiveRecord $model */
+        $model = $this->owner;
+
+        foreach ($this->fileFields as $attribute => $config) {
+            if (false === empty($value = $model->getAttributeBackup($attribute))) {
+                unlink(Yii::getPathOfAlias('webroot')."/$value");
+            }
+        }
     }
 }
