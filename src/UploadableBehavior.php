@@ -1,14 +1,29 @@
 <?php
 
+use Jcupitt\Vips;
+
 class UploadableBehavior extends CActiveRecordBehavior
 {
     /**
      * Список полей, содержащий загружаемые объекты.
      *
-     * Пример конфигурации:
+     * Пример конфигурации без обработки изображения:
      *
      * [
      *     'AttributeName' => ['fileDir' => 'somewhere/i/belong']
+     * ]
+     *
+     * Пример конфигурации с обработкой изображения:
+     *
+     * [
+     *     'AttributeName' => [
+     *        'fileDir' => 'somewhere/i/belong',
+     *        'shrinkWidth' => 1500, // обязательный параметр, без него обработка
+     *                               // не будет производится даже при определении
+     *                               // ниже следующих параметров
+     *        'shrinkHeight' => 1500,
+     *        'autorotate' => true,  // включен по умолчанию
+     *     ]
      * ]
      *
      * @var string[]
@@ -23,6 +38,9 @@ class UploadableBehavior extends CActiveRecordBehavior
         ];
     }
 
+    /**
+     * @param \CModelEvent $event
+     */
     public function beforeSave($event)
     {
         /** @var \application\components\ActiveRecord $model */
@@ -42,25 +60,39 @@ class UploadableBehavior extends CActiveRecordBehavior
                 $publicPath = Yii::getPathOfAlias('webroot');
                 $fileDir = $config['fileDir'] ?? '/files';
                 $fileName = uniqid('', true).'.'.strtolower($value->getExtensionName());
-                if (false === $value->saveAs("{$publicPath}/{$fileDir}/{$fileName}")) {
-                    $errmsg = 'Неизвестная ошибка загрузки файла. Обратитесь к разработчику.';
-                    // Ошибка сохранения. Может, просто не существует директория для загрузки файлов? Попробуем создать...
-                    if (false === is_dir("{$publicPath}/{$fileDir}")) {
-                        $errmsg = mkdir("{$publicPath}/{$fileDir}", 0770, true)
-                            ? "Директория для загрузки файлов {$fileDir} не существовала, но была успешно создана. Попробуйте ещё раз."
-                            : "Директория для загрузки файлов {$fileDir} не существует и не может быть автоматически создана. Обратитесь к разработчику.";
+                $filepath = "{$publicPath}/{$fileDir}/{$fileName}";
+
+                if (!is_dir("{$publicPath}/{$fileDir}")) {
+                    if (!mkdir("{$publicPath}/{$fileDir}", 0770, true)) {
+                        $model->addError($attribute, "Не удалось создать директорию для загрузки файла {$fileDir}. Обратитесь к разработчику.");
+                        $event->isValid = false;
+                        continue;
                     }
-                    $model->addError($attribute, $errmsg);
+                }
+
+                if (isset($config['shrinkWidth'])) {
+                    $tparam = [];
+                    if (isset($config['shrinkHeight'])) $tparam['height'] = $config['shrinkHeight'];
+                    if (isset($config['autorotate'])) $tparam['auto_rotate'] = $config['autorotate'];
+
+                    $img = Vips\Image::thumbnail($value->tempName, $config['shrinkWidth'], $tparam);
+                    $img->writeToFile($filepath);
+                } else $value->saveAs($filepath);
+
+                if (!is_file($filepath)) {
+                    $model->addError($attribute, "Не удалось сохранить файл {$filepath}. Обратитесь к разработчику.");
                     $event->isValid = false;
                     continue;
                 }
+
                 // Удаляем старый файл, если он имеет место быть. Он более не нужен.
                 if ($originalValue = $model->getAttributeBackup($attribute)) {
                     @unlink($publicPath.$originalValue);
                 }
+
                 // Сохраняем имя файла в модели
                 $model->setAttribute($attribute, "/{$fileDir}/{$fileName}");
-            }
+            } else throw new \CException('Значение должно быть экземпляром CUploadedFile');
         }
 
         parent::beforeSave($event);

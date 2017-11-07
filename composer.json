@@ -5,25 +5,26 @@
     "minimum-stability": "stable",
     "license": "MIT",
     "authors": [
-        {
-            "name": "Maksim Makhniuk",
-            "email": "star.absorber@gmail.com"
-        }
+      {
+        "name": "Maksim Makhniuk",
+        "email": "star.absorber@gmail.com"
+      }
     ],
     "config": {
-        "platform": {
-            "php": "5.4.0"
-        }
+      "platform": {
+        "php": "5.4.0"
+      }
     },
     "require": {
-      "php": ">=5.4"
+      "php": ">=5.4",
+      "jcupitt/vips": "^1.0"
     },
-  "require-dev": {
-    "ruvents/yii": "1.1.19"
+    "require-dev": {
+      "ruvents/yii": "1.1.19"
     },
     "autoload": {
-        "classmap": [
-            "./src"
-        ]
+      "classmap": [
+        "./src"
+      ]
     }
 }
