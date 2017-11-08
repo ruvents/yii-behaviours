@@ -62,13 +62,6 @@ class UploadableBehavior extends CActiveRecordBehavior
                 $fileName = uniqid('', true).'.'.strtolower($value->getExtensionName());
                 $filepath = "{$publicPath}/{$fileDir}/{$fileName}";
 
-                if (!is_dir("{$publicPath}/{$fileDir}")) {
-                    if (!mkdir("{$publicPath}/{$fileDir}", 0770, true)) {
-                        $model->addError($attribute, "Не удалось создать директорию для загрузки файла {$fileDir}. Обратитесь к разработчику.");
-                        $event->isValid = false;
-                        continue;
-                    }
-                }
 
                 if (isset($config['shrinkWidth'])) {
                     $tparam = [];
@@ -80,9 +73,15 @@ class UploadableBehavior extends CActiveRecordBehavior
                 } else $value->saveAs($filepath);
 
                 if (!is_file($filepath)) {
-                    $model->addError($attribute, "Не удалось сохранить файл {$filepath}. Обратитесь к разработчику.");
-                    $event->isValid = false;
-                    continue;
+                    if (!is_dir("{$publicPath}/{$fileDir}")) {
+                        if (!mkdir("{$publicPath}/{$fileDir}", 0770, true))
+                            $model->addError($attribute, "Не удалось создать директорию для загрузки файла {$fileDir}. Обратитесь к разработчику.");
+                        else
+                            $model->addError($attribute, "Директория для загрузки файлов {$fileDir} не существовала, но была успешно создана. Попробуйте ещё раз.");
+
+                        $event->isValid = false;
+                        continue;
+                    }
                 }
 
                 // Удаляем старый файл, если он имеет место быть. Он более не нужен.
