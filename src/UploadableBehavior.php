@@ -91,7 +91,7 @@ class UploadableBehavior extends CActiveRecordBehavior
 
                 // Сохраняем имя файла в модели
                 $model->setAttribute($attribute, "/{$fileDir}/{$fileName}");
-            } else throw new \CException('Значение должно быть экземпляром CUploadedFile');
+            }
         }
 
         parent::beforeSave($event);
